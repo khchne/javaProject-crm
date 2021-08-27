@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.crm.workbench.dao.ClueActivityRelationDao">
+    <select id="getActivityId" resultType="java.lang.String">
+        select activityId
+        from tbl_clue_activity_relation
+        where clueId = #{clueId};
+    </select>
+    <insert id="bound">
+        insert into tbl_clue_activity_relation (id, clueId, activityId)
+        values (#{id}, #{clueId}, #{activityId});
+    </insert>
+
+    <select id="getClueActivity" resultType="com.example.crm.workbench.domain.Activity">
+        select car.id as id,
+               u.name as owner,
+               a.name,
+               a.startDate,
+               a.endDate,
+               a.cost,
+               a.description,
+               a.createTime,
+               a.createBy,
+               a.editTime,
+               a.editBy
+        from tbl_activity a
+                 join tbl_user u on u.id = a.owner
+                 join tbl_clue_activity_relation car on car.activityId = a.id
+        where a.id in (
+            select activityId
+            from tbl_clue_activity_relation
+            where clueId = #{clueId}
+        );
+    </select>
+    <delete id="unbound">
+        delete
+        from tbl_clue_activity_relation
+        where id = #{id};
+    </delete>
+    <select id="getActivityRelationSearch" resultType="com.example.crm.workbench.domain.Activity">
+        select a.id,
+               u.name as owner,
+               a.name,
+               a.startDate,
+               a.endDate,
+               a.cost,
+               a.description,
+               a.createTime,
+               a.createBy,
+               a.editTime,
+               a.editBy
+        from tbl_activity a
+                 join tbl_user u on u.id = a.owner
+        where a.name like '%' #{activityName} '%' and
+        a.id not in (
+            select activityId
+            from tbl_clue_activity_relation
+            where clueId = #{clueId}
+            );
+    </select>
+
+</mapper>
+    

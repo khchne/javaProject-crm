@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.crm.workbench.dao.TransactionDao">
+    <insert id="save">
+        insert into tbl_tran (id,
+                              owner,
+                              money,
+                              name,
+                              expectedDate,
+                              customerId,
+                              stage,
+                              type,
+                              source,
+                              activityId,
+                              contactsId,
+                              createBy,
+                              createTime,
+                              editBy,
+                              editTime,
+                              description,
+                              contactSummary,
+                              nextContactTime)
+        values (#{id},
+                #{owner},
+                #{money},
+                #{name},
+                #{expectedDate},
+                #{customerId},
+                #{stage},
+                #{type},
+                #{source},
+                #{activityId},
+                #{contactsId},
+                #{createBy},
+                #{createTime},
+                #{editBy},
+                #{editTime},
+                #{description},
+                #{contactSummary},
+                #{nextContactTime})
+    </insert>
+    <select id="getTran" resultType="com.example.crm.workbench.domain.Transaction">
+        select t.id,
+               u.name      as owner,
+               t.money,
+               t.name,
+               t.expectedDate,
+               c.name      as customerId,
+               t.stage,
+               t.type,
+               t.source,
+               a.name      as activityId,
+               ct.fullname as contactsId,
+               t.createBy,
+               t.createTime,
+               t.editBy,
+               t.editTime,
+               t.description,
+               t.contactSummary,
+               t.nextContactTime
+
+        from tbl_tran t
+                 join tbl_user u on t.owner = u.id
+                 join tbl_activity a on t.activityId = a.id
+                 join tbl_customer c on c.id = t.customerId
+                 join tbl_contacts ct on ct.id = t.contactsId
+        where t.id = #{id};
+    </select>
+    <update id="changeStage">
+        update tbl_tran
+        set stage    = #{transaction.stage},
+            editTime = #{transaction.editTime},
+            editBy   = #{transaction.editBy}
+        where id = #{id};
+    </update>
+    <select id="count" resultType="int">
+        select count(*) from tbl_tran;
+    </select>
+    <select id="getStageCount" resultType="java.util.Map">
+        select  count(*) as value, stage as name from tbl_tran group by stage;
+    </select>
+</mapper>
+    
